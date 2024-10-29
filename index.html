@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Number Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 10px;
+            background-color: #f4f4f4;
+            text-align: center;
+            touch-action: manipulation; /* 禁止触摸操作缩放 */
+        }
+        h1 {
+            color: #333;
+            font-size: 6vw;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 4vw; /* 调整按钮字体大小 */
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            width: 80%;
+            max-width: 400px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .output {
+            margin-top: 20px;
+            font-size: 5vw;
+            color: #333;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 400px;
+            margin: 10px auto;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .container {
+            margin-top: 30px;
+        }
+        /* 使用媒体查询调整小屏幕上的按钮大小和文字大小 */
+        @media (max-width: 600px) {
+            button {
+                font-size: 5vw; /* 在小屏幕上适当调整按钮字体大小 */
+                padding: 10px;
+            }
+            .output {
+                font-size: 6vw;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Lucky Number Generator</h1>
+
+    <div class="container">
+        <button onclick="debouncedGenerateNumbersRule1()">规则1: 6个(1-33) + 1个(1-16)</button>
+        <div id="output1" class="output">点击上方按钮生成</div>
+    </div>
+
+    <div class="container">
+        <button onclick="debouncedGenerateNumbersRule2()">规则2: 5个(1-35) + 2个(1-12)</button>
+        <div id="output2" class="output">点击上方按钮生成</div>
+    </div>
+
+    <script>
+        // 防抖动函数
+        function debounce(func, delay) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        // 规则1：前六个数字是1-33的随机数字，第七个是1-16的随机数字（可以重复）
+        function generateNumbersRule1() {
+            const outputDiv = document.getElementById("output1");
+            outputDiv.innerHTML = ""; // 清空之前的内容
+
+            let group = new Set(); // 使用 Set 确保前六个数字互不重复
+
+            // 生成6个1-33的随机数字
+            while (group.size < 6) {
+                let num = Math.floor(Math.random() * 33) + 1;
+                group.add(num); // Set 会自动处理重复
+            }
+
+            // 生成1个1-16的随机数字（可以与前六个数字重复）
+            let lastNum = Math.floor(Math.random() * 16) + 1;
+
+            // 将前六个数字排序
+            const sortedGroup = Array.from(group).sort((a, b) => a - b);
+            outputDiv.innerHTML = `<strong>${sortedGroup.map(num => String(num).padStart(2, '0')).join(", ")}</strong> + <strong>${String(lastNum).padStart(2, '0')}</strong>`;
+        }
+
+        // 规则2：前五个数字是1-35的随机数字，第六，第七个数字是1-12的随机数字
+        function generateNumbersRule2() {
+            const outputDiv = document.getElementById("output2");
+            outputDiv.innerHTML = ""; // 清空之前的内容
+
+            let group = new Set(); // 使用 Set 确保前五个数字互不重复
+
+            // 生成5个1-35的随机数字
+            while (group.size < 5) {
+                let num = Math.floor(Math.random() * 35) + 1;
+                group.add(num); // Set 会自动处理重复
+            }
+
+            // 生成2个1-12的随机数字（后两个数字之间不能重复）
+            let secondGroup = new Set();
+            while (secondGroup.size < 2) {
+                let num = Math.floor(Math.random() * 12) + 1;
+                secondGroup.add(num); // 直接使用 Set 确保后两个数字之间不重复
+            }
+
+            // 将所有数字排序
+            const sortedGroup = Array.from(group).sort((a, b) => a - b);
+            const sortedSecondGroup = Array.from(secondGroup).sort((a, b) => a - b);
+            outputDiv.innerHTML = `<strong>${sortedGroup.map(num => String(num).padStart(2, '0')).join(", ")}</strong> + <strong>${sortedSecondGroup.map(num => String(num).padStart(2, '0')).join(", ")}</strong>`;
+        }
+
+        // 创建防抖动版本的生成函数
+        const debouncedGenerateNumbersRule1 = debounce(generateNumbersRule1, 300);
+        const debouncedGenerateNumbersRule2 = debounce(generateNumbersRule2, 300);
+    </script>
+
+</body>
+</html>
